@@ -1,3 +1,6 @@
 include:
     - project: vernok/gitlab-ci-templates
       file: /october-plugin-ci.yml
+
+variables:
+    PACKAGIST_PUBLISH: "true"
