@@ -3,3 +3,5 @@
 0.0.2:
     - 'Fix void union return type in RegisterViteAssetTokenListener.'
     - 'Enable Packagist publish on semver release tags via CI.'
+0.0.3:
+    - 'Configure Packagist CI publish with GitHub repository URL for oc-vite-plugin.'
