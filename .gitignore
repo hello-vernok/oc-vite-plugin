@@ -1,0 +1,8 @@
+.idea
+node_modules
+vendor
+
+auth.json
+composer.lock
+
+.phpunit.result.cache

@@ -1,0 +1,5 @@
+plugin:
+    name: 'vernok.vite::lang.plugin.name'
+    description: 'vernok.vite::lang.plugin.description'
+    author: 'Vernok'
+    icon: 'icon-bolt'

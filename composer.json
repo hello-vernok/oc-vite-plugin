@@ -1,0 +1,36 @@
+{
+    "name": "vernok/oc-vite-plugin",
+    "description": "Vite asset resolver for October CMS themes and plugins (manifest + dev server).",
+    "license": "MIT",
+    "type": "october-plugin",
+    "authors": [
+        {
+            "name": "Vernok"
+        }
+    ],
+    "require": {
+        "php": "^8.3",
+        "october/rain": "^4.0"
+    },
+    "require-dev": {
+        "laravel/pint": "^1.29",
+        "phpunit/phpunit": "^9.6"
+    },
+    "scripts": {
+        "pint": "vendor/bin/pint",
+        "pint:test": "vendor/bin/pint --test",
+        "format": "@pint",
+        "format:check": "@pint:test",
+        "test": "../../../vendor/bin/phpunit -c phpunit.xml"
+    },
+    "scripts-descriptions": {
+        "pint": "Run Laravel Pint and fix code style.",
+        "pint:test": "Run Laravel Pint in dry-run mode (CI-safe, non-zero exit on diff).",
+        "test": "Run PHPUnit for this plugin (October app vendor path)."
+    },
+    "config": {
+        "allow-plugins": {
+            "composer/installers": true
+        }
+    }
+}

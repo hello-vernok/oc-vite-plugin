@@ -1,0 +1,16 @@
+{
+    "preset": "laravel",
+    "risky": true,
+    "rules": {
+        "void_return": true,
+        "phpdoc_to_return_type": true,
+        "phpdoc_to_param_type": true,
+        "phpdoc_to_property_type": true,
+        "binary_operator_spaces": {
+            "default": "single_space",
+            "operators": {
+                "=>": "align_single_space_minimal"
+            }
+        }
+    }
+}
