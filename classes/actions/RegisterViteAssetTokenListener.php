@@ -17,7 +17,7 @@ class RegisterViteAssetTokenListener
      */
     public function execute(): void
     {
-        Event::listen('system.assets.beforeAddAsset', function (string &$type, string &$path, array &$attributes): bool|void {
+        Event::listen('system.assets.beforeAddAsset', function (string &$type, string &$path, array &$attributes) {
             if (! ViteAssetToken::contains($path)) {
                 return;
             }
