@@ -4,4 +4,4 @@ include:
 
 variables:
     PACKAGIST_PUBLISH: "true"
-    PACKAGIST_REPOSITORY_URL: "https://github.com/hello-vernok/vite-plugin-october"
+    PACKAGIST_REPOSITORY_URL: "https://github.com/hello-vernok/oc-vite-plugin"
