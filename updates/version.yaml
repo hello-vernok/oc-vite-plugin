@@ -5,3 +5,5 @@
     - 'Enable Packagist publish on semver release tags via CI.'
 0.0.3:
     - 'Configure Packagist CI publish with GitHub repository URL for oc-vite-plugin.'
+0.0.4:
+    - 'Align README and composer.json with Packagist install docs and ^0.0.1 constraint.'
