@@ -7,3 +7,9 @@
     - 'Configure Packagist CI publish with GitHub repository URL for oc-vite-plugin.'
 0.0.4:
     - 'Align README and composer.json with Packagist install docs and ^0.0.1 constraint.'
+0.0.5:
+    - 'Register vite: scope from CMS components via component.run (page and partial components).'
+    - 'CMS frontend scope fallback without backtrace; backend keeps backtrace for FormWidgets.'
+    - 'Append pending vite-CSS at {% scripts %} when partial components enqueue after {% styles %}.'
+    - 'Emit manifest-linked CSS when rendering addJs / vite_scripts JS entries in production.'
+    - 'Fix cms.assets.render crash when October passes a null result.'

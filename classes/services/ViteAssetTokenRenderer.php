@@ -23,20 +23,29 @@ class ViteAssetTokenRenderer
     /**
      * @param  string  $path
      * @param  string|null  $assetType
+     * @param  string|null  $scope
+     * @param  string|null  $pluginCode
      *
      * @return string
      */
-    public function renderPath(string $path, ?string $assetType = null): string
-    {
+    public function renderPath(
+        string $path,
+        ?string $assetType = null,
+        ?string $scope = null,
+        ?string $pluginCode = null,
+    ): string {
         $parsed = ViteAssetToken::parse($path);
         if ($parsed === null) {
             return '';
         }
 
         [$scope, $pluginCode] = ViteScopeResolver::resolve(
-            $parsed['scope'],
-            $parsed['pluginCode'],
+            $scope ?? $parsed['scope'],
+            $pluginCode ?? $parsed['pluginCode'],
             [$parsed['entry']],
+            null,
+            null,
+            ViteScopeResolver::shouldUseBacktraceFallback(),
         );
 
         $renderType = in_array($assetType, ['js', 'css'], true) ? $assetType : null;
@@ -54,7 +63,12 @@ class ViteAssetTokenRenderer
         $tags = [];
 
         foreach ($this->queue->drain($type) as $item) {
-            $rendered = $this->renderPath($item['path'], $item['type']);
+            $rendered = $this->renderPath(
+                $item['path'],
+                $item['type'],
+                $item['scope'] ?? null,
+                $item['pluginCode'] ?? null,
+            );
             if ($rendered !== '') {
                 $tags[] = $rendered;
             }
@@ -110,8 +124,19 @@ class ViteAssetTokenRenderer
         $result = $this->replaceRenderedAssets($result, $normalizedType);
         $queued = $this->renderQueued($normalizedType);
 
+        if ($normalizedType === 'js') {
+            $pendingCss = $this->renderQueued('css');
+            if ($pendingCss !== '') {
+                $queued = $queued === '' ? $pendingCss : rtrim($queued)."\n".$pendingCss;
+            }
+        }
+
         if ($queued === '') {
             return $result;
+        }
+
+        if (trim($result) === '') {
+            return $queued;
         }
 
         return rtrim($result)."\n".$queued;

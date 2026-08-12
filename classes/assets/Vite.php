@@ -281,7 +281,7 @@ class Vite
                 }
             }
 
-            if ($type === null || $type === 'css') {
+            if ($type === null || $type === 'css' || $type === 'js') {
                 foreach ($collected['css'] as $css) {
                     $integrity = ! empty($css['integrity'])
                         ? ' integrity="'.htmlspecialchars((string) $css['integrity'], ENT_QUOTES).'"'

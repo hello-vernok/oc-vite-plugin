@@ -6,10 +6,13 @@ use Event;
 use Illuminate\Support\ServiceProvider as ServiceProviderBase;
 use Twig\Environment as TwigEnvironment;
 use Twig\TwigFunction;
+use Vernok\Vite\Classes\Actions\RegisterViteCmsComponentAssetScopeListener;
+use Vernok\Vite\Classes\Actions\RegisterViteAssetScopeListeners;
 use Vernok\Vite\Classes\Actions\RegisterViteAssetTokenListener;
 use Vernok\Vite\Classes\Assets\Vite;
 use Vernok\Vite\Classes\Services\ViteAssetTokenQueue;
 use Vernok\Vite\Classes\Services\ViteAssetTokenRenderer;
+use Vernok\Vite\Classes\Support\ViteAssetScopeRegistry;
 
 /**
  * Registers Vite helpers, config, and Twig functions.
@@ -29,6 +32,7 @@ class ServiceProvider extends ServiceProviderBase
         $this->app->singleton(Vite::class);
         $this->app->singleton(ViteAssetTokenQueue::class);
         $this->app->singleton(ViteAssetTokenRenderer::class);
+        $this->app->singleton(ViteAssetScopeRegistry::class);
 
         require_once plugins_path('vernok/vite/helpers.php');
     }
@@ -38,6 +42,8 @@ class ServiceProvider extends ServiceProviderBase
      */
     public function boot(): void
     {
+        (new RegisterViteCmsComponentAssetScopeListener)->execute();
+        (new RegisterViteAssetScopeListeners)->execute();
         (new RegisterViteAssetTokenListener)->execute();
 
         Event::listen('cms.extendTwig', function (TwigEnvironment $twig): void {

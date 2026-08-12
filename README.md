@@ -195,7 +195,22 @@ npm run build        # production — writes assets/.vite/manifest.json
 $this->addJs('vite:resources/modules/checkout/entrypoint.ts');
 ```
 
+For TypeScript entrypoints that import SCSS, **`addJs()` alone is sufficient** — linked CSS from the manifest or dev-server module graph is emitted automatically. Use `addCss('vite:…scss')` only for dedicated stylesheet entrypoints not imported via JS.
+
 Entry paths match the **source paths** under `resources/` in your repository (as registered in the manifest), not hashed output filenames.
+
+### Components in theme partials
+
+CMS components declared in a partial's front matter (`[myComponent]` in the INI section) run `onRun()` when the partial renders. Vite scope is registered automatically from the component namespace via `component.run` — no explicit `vite:plugin:…` token required.
+
+| Location | `onRun()` timing | `{% styles %}` in `<head>` | `{% scripts %}` after partial |
+|---|---|---|---|
+| Page front matter | Before HTML (`execPageCycle`) | Yes (CSS) | Yes (JS) |
+| Theme partial | Mid-page when partial renders | No (head already rendered) | Yes (JS + pending CSS fallback) |
+
+Place `{% partial %}` **before** `{% scripts %}` in your layout or page. CSS from partial-only components cannot appear in `<head>` `{% styles %}` because October renders the head before body partials; Vernok.Vite appends pending vite-CSS when `{% scripts %}` runs.
+
+The `{% component %}` tag is only required when you want the component's default markup — asset registration via `onRun()` works from the INI alias alone.
 
 ## Registering assets with `addJs` and `addCss`
 
@@ -203,8 +218,21 @@ The **`vite:`** prefix is the recommended way to load Vite bundles from PHP. Use
 
 ```php
 $this->addJs('vite:resources/modules/admin/entrypoint.ts');
+```
+
+TypeScript module entrypoints:
+
+```php
+$this->addJs('vite:resources/modules/admin/entrypoint.ts');
+```
+
+Dedicated SCSS entrypoint (not imported via JS):
+
+```php
 $this->addCss('vite:resources/scss/admin.scss');
 ```
+
+Do not register the same `.ts` entrypoint with both `addJs` and `addCss` — `addJs` is enough for bundled CSS.
 
 Works on the **frontend** (`{% scripts %}` / `{% styles %}`) and in the **backend** layout `<head>`.
 
@@ -236,8 +264,9 @@ $this->addJs('vite:plugin:Acme.Blog:resources/modules/blog/entrypoint.ts');
 
 ### CSS behaviour
 
-- **Development:** CSS imported by a JS entry loads through the Vite module graph. Separate `addCss('vite:…scss')` entries are supported for dedicated stylesheet entrypoints.
+- **Development:** CSS imported by a JS entry loads through the Vite module graph. `addJs('vite:…entrypoint.ts')` is sufficient for typical module bundles.
 - **Production:** CSS arrays on the manifest entry (and shared chunks via `imports`) are emitted as `<link>` tags automatically.
+- **Partial components:** vite-CSS queued from `addCss()` in a partial is appended at `{% scripts %}` when it could not be drained at `{% styles %}`.
 
 ### Alternatives
 
@@ -404,6 +433,8 @@ composer pint:test
 | Dev assets not loading | Missing or invalid `.vite-dev.json` | Run `npm run dev` in the correct directory; confirm `origin` is set |
 | Production works, dev does not | `VITE_DEV_SERVER_ENABLED=false` | Remove or set to `null` in `.env` |
 | Wrong plugin manifest | Autodetection chose theme | Use `vite:plugin:Vendor.Plugin:…` or explicit Twig scope |
+| Partial component + `theme:…` manifest comment | Scope not registered (check `component.run`) | Ensure component is in partial INI; `{% scripts %}` after partial |
+| Partial CSS not in `<head>` | October render order | Expected — CSS appears at `{% scripts %}`; move `{% styles %}` after content for strict `<head>` CSS |
 | `vite:` appears literally in HTML | Plugin not installed or cache | `php artisan plugin:install Vernok.Vite`; `php artisan cache:clear` |
 | Stale dev mode after crash | Leftover `.vite-dev.json` | Delete the file manually |
 

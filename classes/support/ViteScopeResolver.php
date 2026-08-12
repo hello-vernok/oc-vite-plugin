@@ -17,7 +17,30 @@ class ViteScopeResolver
     private static ?string $ownPluginRootLower = null;
 
     /**
+     * Whether resolve() may fall back to backtrace-based plugin detection.
+     *
+     * @return bool
+     */
+    public static function shouldUseBacktraceFallback(): bool
+    {
+        if (! function_exists('app')) {
+            return false;
+        }
+
+        try {
+            return app()->runningInBackend();
+        } catch (\Throwable) {
+            return false;
+        }
+    }
+
+    /**
+     * @param  ?string  $scope
+     * @param  ?string  $pluginCode
      * @param  array<int, string>  $entries
+     * @param  ?string  $assetPath
+     * @param  ?string  $contextClass
+     * @param  bool  $allowBacktraceFallback
      *
      * @return array{0: string, 1: string|null}
      */
@@ -27,6 +50,7 @@ class ViteScopeResolver
         array $entries = [],
         ?string $assetPath = null,
         ?string $contextClass = null,
+        bool $allowBacktraceFallback = true,
     ): array {
         $normalizedScope = self::normalizeScope($scope);
         $pluginCode = self::normalizePluginCode($pluginCode);
@@ -59,9 +83,11 @@ class ViteScopeResolver
             }
         }
 
-        $pluginCodeFromBacktrace = self::detectPluginCodeFromBacktrace();
-        if ($pluginCodeFromBacktrace !== null) {
-            return ['plugin', $pluginCodeFromBacktrace];
+        if ($allowBacktraceFallback) {
+            $pluginCodeFromBacktrace = self::detectPluginCodeFromBacktrace();
+            if ($pluginCodeFromBacktrace !== null) {
+                return ['plugin', $pluginCodeFromBacktrace];
+            }
         }
 
         return ['theme', null];
@@ -93,10 +119,45 @@ class ViteScopeResolver
     }
 
     /**
+     * First plugin-owning class on the call stack (e.g. a component calling addJs from onRun).
+     *
+     * @return class-string|null
+     */
+    public static function detectContextClassFromBacktrace(): ?string
+    {
+        $trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 25);
+
+        foreach ($trace as $frame) {
+            if (! isset($frame['class'])) {
+                continue;
+            }
+
+            $class = (string) $frame['class'];
+            if (self::detectPluginCodeFromClass($class) === null) {
+                continue;
+            }
+
+            $file = isset($frame['file']) ? str_replace('\\', '/', (string) $frame['file']) : '';
+            if ($file !== '' && self::isOwnPluginFile($file)) {
+                continue;
+            }
+
+            return $class;
+        }
+
+        return null;
+    }
+
+    /**
      * @return string|null
      */
     public static function detectPluginCodeFromBacktrace(): ?string
     {
+        $contextClass = self::detectContextClassFromBacktrace();
+        if ($contextClass !== null) {
+            return self::detectPluginCodeFromClass($contextClass);
+        }
+
         $trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 25);
 
         $foundPluginCode = null;

@@ -42,9 +42,16 @@ class ViteScopeResolverTest extends TestCase
         $this->assertSame('Acme.Blog', $pluginCode);
     }
 
-    public function test_it_defaults_to_theme_without_hints(): void
+    public function test_it_defaults_to_theme_without_hints_when_backtrace_disabled(): void
     {
-        [$scope, $pluginCode] = ViteScopeResolver::resolve(null, null, ['resources/modules/foo/entrypoint.ts']);
+        [$scope, $pluginCode] = ViteScopeResolver::resolve(
+            null,
+            null,
+            ['resources/modules/foo/entrypoint.ts'],
+            null,
+            null,
+            false,
+        );
 
         $this->assertSame('theme', $scope);
         $this->assertNull($pluginCode);
@@ -62,6 +69,20 @@ class ViteScopeResolverTest extends TestCase
 
         $this->assertSame('plugin', $scope);
         $this->assertSame('Vernok.ContentEditor', $pluginCode);
+    }
+
+    public function test_it_resolves_plugin_scope_for_module_entrypoint_via_context_class(): void
+    {
+        [$scope, $pluginCode] = ViteScopeResolver::resolve(
+            null,
+            null,
+            ['resources/modules/blog/entrypoint.ts'],
+            null,
+            'Acme\\Blog\\Components\\ListView',
+        );
+
+        $this->assertSame('plugin', $scope);
+        $this->assertSame('Acme.Blog', $pluginCode);
     }
 
     public function test_context_class_beats_theme_root_entrypoint_heuristic(): void

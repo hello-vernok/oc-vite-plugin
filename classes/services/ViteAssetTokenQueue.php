@@ -8,28 +8,32 @@ namespace Vernok\Vite\Classes\Services;
 class ViteAssetTokenQueue
 {
     /**
-     * @var array<int, array{path: string, type: string}>
+     * @var array<int, array{path: string, type: string, scope: ?string, pluginCode: ?string}>
      */
     protected array $items = [];
 
     /**
      * @param  string  $path
      * @param  string  $type
+     * @param  string|null  $scope
+     * @param  string|null  $pluginCode
      *
      * @return void
      */
-    public function push(string $path, string $type): void
+    public function push(string $path, string $type, ?string $scope = null, ?string $pluginCode = null): void
     {
         $this->items[] = [
-            'path' => $path,
-            'type' => strtolower($type),
+            'path'       => $path,
+            'type'       => strtolower($type),
+            'scope'      => $scope,
+            'pluginCode' => $pluginCode,
         ];
     }
 
     /**
      * @param  string|null  $type
      *
-     * @return array<int, array{path: string, type: string}>
+     * @return array<int, array{path: string, type: string, scope: ?string, pluginCode: ?string}>
      */
     public function drain(?string $type = null): array
     {

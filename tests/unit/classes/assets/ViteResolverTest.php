@@ -192,6 +192,22 @@ class ViteResolverTest extends TestCase
         $this->assertSame('<!-- Vite: plugin code missing -->', $html);
     }
 
+    public function test_render_tags_with_js_type_includes_linked_manifest_css(): void
+    {
+        $this->writeManifest($this->tmp.'/plugins/acme/blog/assets/.vite/manifest.json', [
+            'resources/modules/blog/entrypoint.ts' => [
+                'file' => 'modules/blog/entrypoint-a.js',
+                'css'  => ['modules/blog/entrypoint-a.css'],
+            ],
+        ]);
+
+        $vite = $this->makeResolver();
+        $html = $vite->renderTags(['resources/modules/blog/entrypoint.ts'], 'plugin', 'Acme.Blog', 'js');
+
+        $this->assertStringContainsString('/plugins/acme/blog/assets/modules/blog/entrypoint-a.js', $html);
+        $this->assertStringContainsString('/plugins/acme/blog/assets/modules/blog/entrypoint-a.css', $html);
+    }
+
     public function test_corrupted_dev_json_falls_back_to_build(): void
     {
         $this->writeFile($this->tmp.'/plugins/acme/blog/.vite-dev.json', '{"origin":');
