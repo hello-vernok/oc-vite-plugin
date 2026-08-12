@@ -1,5 +1,5 @@
 {
-    "name": "vernok/oc-vite-plugin",
+    "name": "vernok/vite-plugin",
     "description": "Vite asset resolver for October CMS themes and plugins (manifest + dev server).",
     "license": "MIT",
     "type": "october-plugin",
