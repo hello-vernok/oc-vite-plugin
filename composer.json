@@ -3,9 +3,9 @@
     "description": "Vite asset resolver for October CMS themes and plugins (manifest + dev server).",
     "license": "MIT",
     "type": "october-plugin",
-    "homepage": "https://github.com/hello-vernok/oc-vite-plugin",
+    "homepage": "https://github.com/hello-vernok/vite-plugin",
     "support": {
-        "source": "https://github.com/hello-vernok/oc-vite-plugin"
+        "source": "https://github.com/hello-vernok/vite-plugin"
     },
     "keywords": [
         "octobercms",

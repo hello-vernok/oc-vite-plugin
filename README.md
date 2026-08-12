@@ -50,7 +50,7 @@ Agencies benefit from shared conventions — the same folder layout, manifest lo
 
 Before shipping a theme or plugin with Vite assets:
 
-1. **October CMS app** — `composer require vernok/vite-plugin:^0.0.1` (Packagist) or `php artisan plugin:install Vernok.Vite`
+1. **October CMS app** — `composer require vernok/vite-plugin:^0.0.5` (Packagist) or `php artisan plugin:install Vernok.Vite`
 2. **Your plugin/theme** — `require: [Vernok.Vite]` in `plugin.yaml` or `theme.yaml`
 3. **Asset repo** — `npm i -D @vernok/vite-plugin-october vite` and a `vite.config.ts` using `definePluginConfig()` or `defineThemeConfig()`
 4. **Local dev** — `npm run dev` from the theme/plugin directory (not the October root)
@@ -75,7 +75,7 @@ Each theme or plugin with frontend assets needs its own `package.json`, `vite.co
 **Via Composer (Packagist):**
 
 ```bash
-composer require vernok/vite-plugin:^0.0.1
+composer require vernok/vite-plugin:^0.0.5
 php artisan october:up
 ```
 
@@ -106,7 +106,7 @@ require:
 ```json
 {
   "require": {
-    "vernok/vite-plugin": "^0.0.1"
+    "vernok/vite-plugin": "^0.0.5"
   }
 }
 ```
